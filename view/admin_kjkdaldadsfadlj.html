@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>淘宝信息</title>
+    {% include "./header.html" %}
+</head>
+
+<body>
+    <table id="example2" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>账号名称</th>
+                <th>密码</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="box-footer">
+        <button type="button" class="btn btn-primary button"  data-toggle='modal' data-target='#myModal'>添加账号</button>
+    </div>
+    {% include "./footer.html" %}
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="usernameModel">账号</label>
+                        <input class="form-control" id="usernameModel" name="usernameModel" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordModel">密码</label>
+                        <form>
+                                <input class="form-control" id="passwordModel" name="passwordModel" placeholder="请输入密码">
+                        </form>
+                    </div>
+                    <input type="hidden" name="idModel" id="idModel">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary button">确认更新</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(function () {
+        $.ajax({
+            type: 'get',
+            url: 'http://39.108.55.222/admin/list',
+            success: function (data) {
+                //DataTable
+                var table = $('#example2').DataTable({
+                    'paging': true,
+                    'lengthChange': false,
+                    'searching': false,
+                    'ordering': true,
+                    'info': true,
+                    'autoWidth': false,
+                    'data': data,
+                    'columns': [{
+                            "data": "username"
+                        },
+                        {
+                            "data": "password"
+                        }
+                    ],
+                    "columnDefs": [{ //设置 编辑按钮
+                        "targets": [2],
+                        "data": "id",
+                        "render": function (data, type, full) {
+
+                            return "<a class='edit'  href='javascript:void(0)' edit='" + data + "'data-toggle='modal' data-target='#myModal'>编辑</a>&nbsp;&nbsp;&nbsp;&nbsp;<a class='del' del='" +
+                                data + "'href='javascript:void(0)'>删除</a>";
+                        }
+                    }],
+                    "oLanguage": {
+                        "sLengthMenu": "每页显示 _MENU_ 条记录",
+                        "sZeroRecords": "对不起，查询不到任何相关数据",
+                        "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
+                        "sInfoEmtpy": "找不到相关数据",
+                        "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                        "sProcessing": "正在加载中...",
+                        "sSearch": "搜索",
+                        "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                        "oPaginate": {
+                            "sFirst": "第一页",
+                            "sPrevious": " 上一页 ",
+                            "sNext": " 下一页 ",
+                            "sLast": " 最后一页 "
+                        }
+                    }, //多语言配置
+                })
+                //DataTable
+                //给行绑定选中事件
+                $('#example2 tbody').on('click', 'tr', function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+                    } else {
+                        table.$('tr.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                    }
+                });
+                //删除
+                $(".del").click(function () {
+                    $.ajax({
+                        type: 'post',
+                        url: 'http://39.108.55.222/admin/del',
+                        data: {
+                            "id": $(this).attr("del")
+                        },
+                        success: function (data) {
+                            if (data.succ) {
+                                alert("删除成功");
+                                window.location.reload();
+                            } else {
+                                alert("删除失败");
+                            }
+                        }
+                    });
+                });
+                //编辑
+                $(".edit").click(function () {
+                    var username=$(this).parent().prev().prev().text();
+                    var password=$(this).parent().prev().text();
+                    var id=$(this).attr("edit");
+                    console.log(username+"  "+password+" "+id);
+                    $("#usernameModel").val(username);
+                    $("#passwordModel").val(password);
+                    $("#idModel").val(id);
+                });
+                //编辑更新
+                $(".modal-footer .button").click(function () {
+                    var username= $("#usernameModel").val();
+                    var password= $("#passwordModel").val();
+                    var id = $("#idModel").val();
+                    $.ajax({
+                        type: 'post',
+                        url: 'http://39.108.55.222/admin/save',
+                        data: {
+                            "id": id,
+                            "username": username,
+                            "password": password
+                        },
+                        success: function (data) {
+                            if (data.succ) {
+                                alert("更新成功");
+                                window.location.reload();
+                            } else {
+                                alert("更新失败");
+                            }
+                        }
+                    });
+
+                });
+
+                $(".box-footer .button").click(function () {
+                    $("#usernameModel").val("");
+                    $("#passwordModel").val("");
+                    $("#idModel").val("");
+                });
+
+            }
+        });
+    })
+</script>
+
+</html>

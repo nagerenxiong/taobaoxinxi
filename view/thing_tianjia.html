@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加信息</title>
+    {% include "./header.html" %}
+    <style>
+        .txtarea {
+            resize: none;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <form role="form" method="post">
+        <div class="box-body">
+            <div class="form-group">
+                <label for="name">商品ID</label>
+                <textarea class="txtarea"   id="shangpinId" name="shangpinId" placeholder="请输入正确的商品ID,否则插件找不到对应的数据。如果没有不用填！" style="width: 100%; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;" ></textarea>
+            </div>
+            <div class="form-group">
+                <label for="name">标题</label>
+                <textarea class="txtarea"   id="title" name="title" placeholder="请输入标题" style="width: 100%; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;min-height:360px;" ></textarea>
+            </div>
+            <div class="form-group">
+                <label for="remark">所属店铺</label>
+                <div class="form-group">
+                    <select class="form-control" id="category_name">
+                        {% for item in category %}
+                        <option>{{item.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>快递信息</label>
+                <form>
+                    <textarea class="txtarea" id="kdxx" name="content" placeholder="快递信息" style="width: 100%; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                </form>
+            </div>
+            <div class="form-group">
+                <label>客户备注信息</label>
+                <form>
+                    <textarea class="txtarea" id="khbz" name="content" placeholder="客户备注信息" style="width: 100%; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;"></textarea>
+                </form>
+            </div>
+            <div class="form-group">
+                <label for="jjll">加价利润</label>
+                <input class="form-control" id="jjll" name="jjll" placeholder="加价利润">
+            </div>
+            <div class="form-group">
+                <label for="sjlj">上家链接</label>
+                <input class="form-control" id="sjlj" name="sjlj" placeholder="上家链接">
+            </div>
+            <div class="form-group">
+                <label for="thlj">备选同行链接</label>
+                <input class="form-control" id="thlj" name="thlj" placeholder="备选同行链接">
+            </div>
+        </div>
+        <div class="box-footer">
+            <button type="button" class="btn btn-primary button">确认提交</button>
+        </div>
+    </form>
+    {% include "./footer.html" %}
+</body>
+<script>
+    $(function () {
+        function trim(s){  
+		return trimRight(trimLeft(s));  
+	}  
+	//去掉左边的空白  
+	function trimLeft(s){  
+		if(s == null) {  
+			return "";  
+		}  
+		var whitespace = new String(" \t\n\r");  
+		var str = new String(s);  
+		if (whitespace.indexOf(str.charAt(0)) != -1) {  
+			var j=0, i = str.length;  
+			while (j < i && whitespace.indexOf(str.charAt(j)) != -1){  
+				j++;  
+			}  
+			str = str.substring(j, i);  
+		}  
+		return str;  
+	}  
+	
+	//去掉右边的空白 www.2cto.com   
+	function trimRight(s){  
+		if(s == null) return "";  
+		var whitespace = new String(" \t\n\r");  
+		var str = new String(s);  
+		if (whitespace.indexOf(str.charAt(str.length-1)) != -1){  
+			var i = str.length - 1;  
+			while (i >= 0 && whitespace.indexOf(str.charAt(i)) != -1){  
+			   i--;  
+			}  
+			str = str.substring(0, i+1);  
+		}  
+		return str;  
+	}  
+        $(".button").click(function () {
+            var title =trim($("#title").val());
+            var shangpinId=$("#shangpinId").val();
+            var kdxx = $("#kdxx").val();
+            var khbz = $("#khbz").val();
+            var sjbz = $("#sjbz").val();
+            var gmbz = $("#gmbz").val();
+            var jjll = $("#jjll").val();
+            var yjll = $("#yjll").val();
+            var sjlj = $("#sjlj").val();
+            var thlj = $("#thlj").val();
+            var category_name = $("#category_name").val();
+            $.ajax({
+                type: 'post',
+                url: 'http://39.108.55.222/thing/save',
+                data: {
+                    "title": title,
+                    "shangpinId":shangpinId,
+                    "category_name": category_name,
+                    "kdxx": kdxx,
+                    "khbz": khbz,
+                    "sjbz": sjbz,
+                    "gmbz": gmbz,
+                    "jjll": jjll,
+                    "yjll": yjll,
+                    "sjlj": sjlj,
+                    "thlj": thlj
+                },
+                success: function (data) {
+                    if (data.succ) {
+                        alert("添加成功");
+                        window.location.href = "http://39.108.55.222/thing/index"
+                    } else {
+                        alert("添加失败");
+                    }
+                }
+            });
+
+        });
+    })
+</script>
+
+</html>
